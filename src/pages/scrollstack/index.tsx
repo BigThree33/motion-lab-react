@@ -2,6 +2,7 @@
 import HeroSection from './components/HeroSection'
 import SecondSection from './components/SecondSection'
 import FooterSection from './components/FooterSection'
+import NoteSection from './components/NoteSection'
 import './index.css'
 
 export default function ScrollStackPage() {
@@ -10,6 +11,7 @@ export default function ScrollStackPage() {
       <HeroSection />
       <SecondSection />
       <FooterSection />
+      <NoteSection/>
     </section>
   )
 }
