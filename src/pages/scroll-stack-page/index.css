@@ -1,0 +1,44 @@
+.scroll-stack-page {
+  min-height: 240svh;
+  padding: clamp(28px, 5vw, 72px);
+  color: #171717;
+  background:
+    radial-gradient(circle at 24% 12%, rgba(249, 115, 22, 0.18), transparent 30%),
+    linear-gradient(135deg, #fffaf1 0%, #f4f7fb 52%, #eaf4ee 100%);
+}
+
+.scroll-stack-page__intro {
+  max-width: 760px;
+  margin-bottom: clamp(48px, 9vw, 120px);
+}
+
+.scroll-stack-page__intro span {
+  display: inline-flex;
+  margin-bottom: 18px;
+  color: #b45309;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.scroll-stack-page__intro h1 {
+  color: #101114;
+  font-size: clamp(48px, 9vw, 116px);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+.scroll-stack-page__intro p {
+  max-width: 520px;
+  margin-top: 24px;
+  color: #4b5563;
+  font-size: clamp(18px, 2vw, 22px);
+}
+
+@media (max-width: 760px) {
+  .scroll-stack-page {
+    min-height: 220svh;
+    padding: 28px 18px 64px;
+  }
+}
