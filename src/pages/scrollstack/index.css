@@ -1,0 +1,15 @@
+/* .scroll-stack-page {
+  min-height: 240svh;
+  padding: clamp(28px, 5vw, 72px);
+  color: #171717;
+  background:
+    radial-gradient(circle at 24% 12%, rgba(249, 115, 22, 0.18), transparent 30%),
+    linear-gradient(135deg, #fffaf1 0%, #f4f7fb 52%, #eaf4ee 100%);
+}
+
+@media (max-width: 760px) {
+  .scroll-stack-page {
+    min-height: 220svh;
+    padding: 28px 18px 64px;
+  }
+} */
