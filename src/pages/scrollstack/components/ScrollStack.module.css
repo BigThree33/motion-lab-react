@@ -1,51 +1,53 @@
 .stack {
-  display: grid;
-  gap: 28px;
-  max-width: 860px;
+  position: relative;
+  width: min(440px, 78vw);
+  height: min(74dvh, 620px);
+  overflow: visible;
+  isolation: isolate;
 }
 
 .card {
-  --stack-index: 0;
-
-  position: sticky;
-  top: calc(28px + var(--stack-index) * 18px);
-  min-height: 360px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 600px;
+  height: clamp(320px, 48dvh, 380px);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: clamp(28px, 5vw, 56px);
-  border: 1px solid rgba(17, 24, 39, 0.12);
-  border-radius: 8px;
+  padding: clamp(24px, 4vw, 44px);
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: 18px;
   color: #f9fafb;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 46%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), transparent 44%),
     linear-gradient(145deg, #111827 0%, #234155 45%, #386641 100%);
-  box-shadow: 0 30px 70px rgba(17, 24, 39, 0.22);
-  transform-origin: center top;
-  will-change: transform, opacity, filter;
+  box-shadow: 0 30px 70px rgba(17, 24, 39, 0.24);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .card:nth-child(2) {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 46%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), transparent 44%),
     linear-gradient(145deg, #221d35 0%, #653f2f 48%, #d97706 100%);
 }
 
 .card:nth-child(3) {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 46%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), transparent 44%),
     linear-gradient(145deg, #152238 0%, #155e75 48%, #14b8a6 100%);
 }
 
 .card:nth-child(4) {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 46%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), transparent 44%),
     linear-gradient(145deg, #1c1917 0%, #7f1d1d 44%, #f97316 100%);
 }
 
 .eyebrow {
   width: fit-content;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   padding: 7px 10px;
   border: 1px solid rgba(249, 250, 251, 0.28);
   border-radius: 999px;
@@ -57,28 +59,28 @@
 }
 
 .card h2 {
-  max-width: 620px;
+  max-width: 340px;
   color: #ffffff;
-  font-size: clamp(34px, 6vw, 72px);
+  font-size: clamp(32px, 4.6vw, 56px);
   line-height: 0.98;
   letter-spacing: 0;
 }
 
 .card p {
-  max-width: 520px;
-  margin-top: 20px;
+  max-width: 330px;
+  margin-top: 18px;
   color: rgba(249, 250, 251, 0.78);
-  font-size: clamp(17px, 2vw, 22px);
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.45;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .stack {
-    gap: 18px;
+    width: min(420px, 90vw);
+    height: 620px;
   }
 
   .card {
-    top: calc(18px + var(--stack-index) * 10px);
-    min-height: 320px;
-    padding: 24px;
+    height: 340px;
   }
 }

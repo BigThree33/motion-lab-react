@@ -9,7 +9,6 @@ export default function ScrollStackPage() {
     <section className="container">
       <HeroSection />
       <SecondSection />
-      {/* <ScrollStack /> */}
       <FooterSection />
     </section>
   )

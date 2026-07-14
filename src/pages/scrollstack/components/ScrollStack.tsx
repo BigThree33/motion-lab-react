@@ -1,87 +1,171 @@
-import { useRef, type CSSProperties } from 'react'
+import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import styles from './ScrollStack.module.css'
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(useGSAP, ScrollTrigger)
+
+type ScrollStackProps = {
+  pinTarget: HTMLElement
+}
+
+const CARD_REVEAL = 60
+const INITIAL_CARD_GAP = 20
+const ACTIVE_SCALE = 1.25
 
 const cards = [
   {
-    eyebrow: 'CSS',
-    title: 'Sticky layout',
-    body: 'Each card uses normal document flow with sticky positioning.',
+    eyebrow: 'Card 01',
+    title: 'Pinned viewport',
+    body: 'The section locks when it fills the viewport.',
   },
   {
-    eyebrow: 'GSAP',
-    title: 'Scrubbed entrance',
-    body: 'ScrollTrigger ties opacity, y, and scale to scroll progress.',
+    eyebrow: 'Card 02',
+    title: 'Scale forward',
+    body: 'The next card grows to the active scale as scroll progress advances.',
   },
   {
-    eyebrow: 'React',
-    title: 'Scoped animation',
-    body: 'useGSAP keeps selectors scoped to this component and cleans up on remount.',
+    eyebrow: 'Card 03',
+    title: 'Cover slowly',
+    body: 'Each incoming card settles above the previous one and leaves a 60px reveal.',
   },
   {
-    eyebrow: 'Practice',
-    title: 'Reusable pattern',
-    body: 'Add another card here or extract a new component beside this file.',
+    eyebrow: 'Card 04',
+    title: 'Final stack',
+    body: 'After every card returns to scale 1, the whole group releases to the next section.',
   },
 ]
 
-export default function ScrollStack() {
-  const scopeRef = useRef<HTMLDivElement>(null)
+export default function ScrollStack({ pinTarget }: ScrollStackProps) {
+  const stackRef = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
-      const cardElements = gsap.utils.toArray<HTMLElement>(`.${styles.card}`)
+      const stackElement = stackRef.current
+      const cardElements = stackElement
+        ? Array.from(stackElement.querySelectorAll<HTMLElement>(`.${styles.card}`))
+        : []
 
-      cardElements.forEach((card, index) => {
-        gsap.fromTo(
-          card,
-          {
-            opacity: 0.6,
-            y: 80,
-            scale: 0.96,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: card,
-              start: 'top 82%',
-              end: 'top 42%',
-              scrub: true,
-            },
-          },
+      if (cardElements.length === 0) {
+        return
+      }
+
+      const getCardHeight = () => cardElements[0]?.offsetHeight ?? 360
+
+      const getQueuedCardY = (
+        activeIndex: number,
+        queuedIndex: number,
+        activeScale = 1,
+      ) => {
+        const cardHeight = getCardHeight()
+        const activeY = activeIndex * CARD_REVEAL
+        const activeHeight = cardHeight * activeScale
+        const queueOffset = queuedIndex - activeIndex - 1
+
+        return (
+          activeY +
+          activeHeight +
+          INITIAL_CARD_GAP +
+          queueOffset * (cardHeight + INITIAL_CARD_GAP)
         )
+      }
 
-        gsap.to(card, {
-          scale: 0.92 + index * 0.01,
-          filter: 'brightness(0.88)',
-          ease: 'none',
-          scrollTrigger: {
-            trigger: card,
-            start: 'top 18%',
-            end: 'bottom 12%',
-            scrub: true,
-          },
+      const getInitialY = (index: number) => {
+        if (index === 0) {
+          return 0
+        }
+
+        return getQueuedCardY(0, index, ACTIVE_SCALE)
+      }
+
+      const getScrollDistance = () =>
+        Math.max(window.innerHeight * 3.6, cardElements.length * 560)
+
+      gsap.set(cardElements, {
+        xPercent: -50,
+        y: getInitialY,
+        scale: (index) => (index === 0 ? ACTIVE_SCALE : 1),
+        zIndex: (index) => index + 1,
+        transformOrigin: 'top center',
+      })
+
+      const timeline = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: pinTarget,
+          start: 'top top',
+          end: () => `+=${getScrollDistance()}`,
+          pin: true,
+          scrub: 0.8,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      cardElements.slice(1).forEach((card, offsetIndex) => {
+        const index = offsetIndex + 1
+        const finalY = index * CARD_REVEAL
+        const followingCards = cardElements.slice(index + 1)
+
+        timeline.to(card, {
+          y: finalY,
+          scale: ACTIVE_SCALE,
+          duration: 1.15,
+        })
+
+        if (index === 1) {
+          timeline.to(
+            cardElements[0],
+            {
+              scale: 1,
+              duration: 1.15,
+            },
+            '<',
+          )
+        }
+
+        followingCards.forEach((followingCard, followingOffset) => {
+          const followingIndex = index + followingOffset + 1
+
+          timeline.to(
+            followingCard,
+            {
+              y: () => getQueuedCardY(index, followingIndex, ACTIVE_SCALE),
+              duration: 1.15,
+            },
+            '<',
+          )
+        })
+
+        timeline.to(card, {
+          scale: 1,
+          duration: 0.85,
+        })
+
+        followingCards.forEach((followingCard, followingOffset) => {
+          const followingIndex = index + followingOffset + 1
+
+          timeline.to(
+            followingCard,
+            {
+              y: () => getQueuedCardY(index, followingIndex),
+              duration: 0.85,
+            },
+            '<',
+          )
         })
       })
+
+      timeline.to({}, { duration: 0.45 })
     },
-    { scope: scopeRef },
+    { scope: stackRef, dependencies: [pinTarget], revertOnUpdate: true },
   )
 
   return (
-    <div ref={scopeRef} className={styles.stack}>
-      {cards.map((card, index) => (
-        <article
-          key={card.title}
-          className={styles.card}
-          style={{ '--stack-index': index } as CSSProperties}
-        >
+    <div ref={stackRef} className={styles.stack} aria-label="Scroll stack cards">
+      {cards.map((card) => (
+        <article key={card.title} className={styles.card}>
           <span className={styles.eyebrow}>{card.eyebrow}</span>
           <h2>{card.title}</h2>
           <p>{card.body}</p>
